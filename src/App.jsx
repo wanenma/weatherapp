@@ -1,9 +1,9 @@
 import React from 'react'
-
+import Weather from './components/Weather.jsx'
 const App = () => {
   return (
-    <div>
-      
+    <div class="App">
+      <Weather />
     </div>
   )
 }
