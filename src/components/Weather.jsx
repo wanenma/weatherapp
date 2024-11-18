@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react'
-import "./Weather.css"
-import searchIcon from "../assets/search.png"
-import clouds from "../assets/clouds.png"
-import humidity from "../assets/humidity.png"
-import rain from "../assets/rain.png"
-import rainyDay from "../assets/rainy-day.png"
-import snow from "../assets/snow.png"
-import sun from "../assets/sun.png"
-import wind from "../assets/wind.png"
+import React, { useEffect, useRef, useState } from 'react';
+import "./Weather.css";
+import searchIcon from "../assets/search.png";
+import clouds from "../assets/clouds.png";
+import humidity from "../assets/humidity.png";
+import rain from "../assets/rain.png";
+import rainyDay from "../assets/rainy-day.png";
+import snow from "../assets/snow.png";
+import sun from "../assets/sun.png";
+import wind from "../assets/wind.png";
 const Weather = () => {
     const [weatherData, setWeatherData] = useState(false);
     const allIcons = {
@@ -27,12 +27,22 @@ const Weather = () => {
         "13n": snow
 
     }
+    const input = useRef();
    
     const search = async (city) => {
+        if (city=== "") {
+            alert("Please enter a city");
+            return;
+        }
         try {
             const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${import.meta.env.VITE_APP_ID}`;
             const response = await fetch(url);
             const data = await response.json();
+
+            if (!response.ok){
+                alert(data.message);
+                return;
+            }
             console.log(data);
             const icon = allIcons[data.weather[0].icon]|| allIcons["01d"];
             setWeatherData({
@@ -43,18 +53,21 @@ const Weather = () => {
                 icon: icon
             })
         } catch (error) { 
-            console.log(error);
+            setWeatherData(false);
+            console.error("Error fetching weather data");
         }
     }
     useEffect(() => {
-        search("New York");
+        search("kef");
     }, [])
+  
   return (
     <div className='weather'>
         <div className='searchbar'>
-            <input type="text" placeholder='Search...' />
-            <img src={searchIcon} alt="" />
+            <input ref = {input} type="text" placeholder='Search...' />
+            <img src={searchIcon} alt="" onClick={() => search(input.current.value) }  />
         </div>
+        {setWeatherData?<>
             <img src={weatherData.icon} alt="sun" />
             <p className='temp'>{weatherData.temp}°C</p>
             <p className='city'>{weatherData.city}</p>
@@ -74,6 +87,8 @@ const Weather = () => {
                   </div>
                 </div>
             </div>  
+        </>:<>  </>}
+           
     </div>
   )
 }
